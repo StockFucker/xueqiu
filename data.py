@@ -31,6 +31,7 @@ def download():
     to_se = pd.Series()
     from_w_se = pd.Series()
     to_w_se = pd.Series()
+    cash_se = pd.Series()
     df = pd.DataFrame()
     for page in range(1,19):
         symbol = "ZH185989"
@@ -41,6 +42,7 @@ def download():
         for rebalance in jsonObj["list"]:
             if rebalance["status"] == "success":
                 items = rebalance["rebalancing_histories"]
+                cash = rebalance["cash_value"]
                 for item in items:
                     timeStp = item["updated_at"]
                     ltime=time.localtime(timeStp/1000.0) 
@@ -50,6 +52,7 @@ def download():
                     value = item["net_value"]
                     weight = item["weight"]
                     prev_weight = item["prev_weight_adjusted"]
+                    cash_se[timeStr] = cash
                     # rebalance_type = ""
                     if prev_value is None and value > 0:
                         # rebalance_type = "BUY"
@@ -69,6 +72,7 @@ def download():
     df["to"] = to_se
     df["from_w"] = from_w_se
     df["to_w"] = to_w_se
+    df["cash"] = cash_se
     df.to_csv("data.csv")
     print df.head(20)
 
