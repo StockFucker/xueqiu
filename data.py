@@ -29,6 +29,8 @@ def download():
     stock_se = pd.Series()
     from_se = pd.Series()
     to_se = pd.Series()
+    from_w_se = pd.Series()
+    to_w_se = pd.Series()
     df = pd.DataFrame()
     for page in range(1,19):
         symbol = "ZH185989"
@@ -46,12 +48,18 @@ def download():
                     prev_value = item["prev_net_value"]
                     stock = item["stock_symbol"]
                     value = item["net_value"]
+                    weight = item["weight"]
+                    prev_weight = item["prev_weight_adjusted"]
                     # rebalance_type = ""
                     if prev_value is None and value > 0:
                         # rebalance_type = "BUY"
                         from_se[timeStr] = 0
+                        from_w_se[timeStr] = 0
                     else:
                         from_se[timeStr] = prev_value
+                        from_w_se[timeStr] = prev_weight
+
+                    to_w_se[timeStr] = weight   
                     to_se[timeStr] = value
                     stock_se[timeStr] = stock
             else:
@@ -59,6 +67,8 @@ def download():
     df["stock"] = stock_se
     df["from"] = from_se
     df["to"] = to_se
+    df["from_w"] = from_w_se
+    df["to_w"] = to_w_se
     df.to_csv("data.csv")
     print df.head(20)
 
